@@ -1,11 +1,11 @@
 <template>
   <div>
-    <form class="form-signin">
+    <form class="form-signin" @submit.prevent="signin">
       <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
       <label for="inputEmail" class="sr-only">Email address</label>
-      <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+      <input type="email" id="inputEmail" class="form-control" v-model="user.username" placeholder="Email address" required autofocus>
       <label for="inputPassword" class="sr-only">Password</label>
-      <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+      <input type="password" id="inputPassword" class="form-control" v-model="user.password" placeholder="Password" required>
       <div class="checkbox mb-3">
         <label>
           <input type="checkbox" value="remember-me"> Remember me
@@ -27,6 +27,19 @@ export default {
         password: ""
       }
     };
+  },
+  methods: {
+    signin() {
+      const api = `${process.env.APIPATH}/admin/signin`;
+      const vm = this;
+      this.$http.post(api, vm.user).then(response => {
+        console.log(response.data);
+        //登入成功會跳回首頁
+        if (response.data.success) {
+          vm.$router.push("/");
+        }
+      });
+    }
   }
 };
 </script>
