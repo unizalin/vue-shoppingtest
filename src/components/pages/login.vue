@@ -36,7 +36,7 @@ export default {
         console.log(response.data);
         //登入成功會跳回首頁
         if (response.data.success) {
-          vm.$router.push("/");
+          vm.$router.push("/admin/products");
         }
       });
     }
