@@ -14,7 +14,7 @@ export default {
     getProducts() {
       const api = `${process.env.APIPATH}/api/${
         process.env.CUSTOMPATH
-      }/admin/products`; //"https://vue-course-api.hexschool.io/api/utest/products";
+      }/admin/products`;
       //確保http結束時候，把取回的資料存進去
       const vm = this;
       console.log(process.env.APIPATH, process.env.CUSTOMPATH);
