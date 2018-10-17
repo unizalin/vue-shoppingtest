@@ -209,7 +209,7 @@ export default {
     updateProduct() {
       let api = `${process.env.APIPATH}/api/${
         process.env.CUSTOMPATH
-      }/admin/products`; // 'http://localhost:3000/api/casper/products';
+      }/admin/products`; // 'https://vue-course-api.hexschool.io/api/utest/products';
       //利用true/false 來決定是新增或者編輯，來選擇用post/put
       let httpMethod = "post";
       const vm = this;
