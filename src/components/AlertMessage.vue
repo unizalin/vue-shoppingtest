@@ -47,6 +47,12 @@ export default {
     // 自定義名稱 'messsage:push'
     // message: 傳入參數
     // status: 樣式，預設值為 warning
+    /*
+    呼叫vue的實體下的bus(掛載在vue下的變數) ,用on的方式註冊messsage:push 的方法
+    message: 傳入參數
+    status: bootstrap樣式，預設值為 warning
+    最後觸發vm.updateMessage
+    */
     vm.$bus.$on("messsage:push", (message, status = "warning") => {
       vm.updateMessage(message, status);
     });

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <loading :active.sync="isLoading"></loading>
     <div class="text-right mt-4">
     <button type="button" class="btn btn-primary" @click="openModal(true)">
         建立新的產品</button>
@@ -20,10 +21,10 @@
           <td>{{ item.category }}</td>
           <td>{{ item.title }}</td>
           <td class="text-right">
-            {{ item.origin_price}}
+            {{ item.origin_price| currency }}
           </td>
           <td class="text-right">
-            {{ item.price}}
+            {{ item.price| currency }}
           </td>
           <td>
             <span v-if="item.is_enabled" class="text-success">啟用</span>
@@ -35,7 +36,29 @@
         </tr>
       </tbody>
     </table>
-
+    <!-- 頁碼換頁 -->
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item" :class="{'disabled': !pagination.has_pre }">
+          <a class="page-link" href="#" aria-label="Previous"
+            @click.prevent="getProducts(pagination.current_page - 1)">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Previous</span>
+          </a>
+        </li>
+        <li class="page-item" v-for="page in pagination.total_pages" :key="page"
+          :class="{'active': pagination.current_page === page}">
+          <a class="page-link" href="#" @click.prevent="getProducts(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" :class="{'disabled': !pagination.has_next }">
+          <a class="page-link" href="#" aria-label="Next"
+            @click.prevent="getProducts(pagination.current_page + 1)">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Next</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
     <!-- Modal -->
     <div class="modal fade" id="productModal" tabindex="-1" role="dialog"
       aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -51,7 +74,7 @@
           </div>
           <div class="modal-body">
             ...
-             <div class="row">
+            <div class="row">
               <div class="col-sm-4">
                 <div class="form-group">
                   <label for="image">輸入圖片網址</label>
@@ -61,13 +84,12 @@
                 </div>
                 <div class="form-group">
                   <label for="customFile">或 上傳圖片
-                    <i class="fas fa-spinner fa-spin"></i>
+                    <i class="fas fa-spinner fa-spin" v-if="status.fileUploading"></i>
                   </label>
                   <input type="file" id="customFile" class="form-control"
-                    ref="files">
+                    ref="files" @change="uploadFile">
                 </div>
-                <img img="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=828346ed697837ce808cae68d3ddc3cf&auto=format&fit=crop&w=1350&q=80"
-                  class="img-fluid" :src="tempProduct.imageUrl" alt="">
+                <img class="img-fluid" :src="tempProduct.imageUrl" alt="">
               </div>
               <div class="col-sm-8">
                 <div class="form-group">
@@ -76,7 +98,7 @@
                     v-model="tempProduct.title"
                     placeholder="請輸入標題">
                 </div>
-                 <div class="form-row">
+                <div class="form-row">
                   <div class="form-group col-md-6">
                     <label for="category">分類</label>
                     <input type="text" class="form-control" id="category"
@@ -150,17 +172,26 @@ export default {
     return {
       products: [],
       tempProduct: {},//模板的欄位綁定，透過post方式，將模板新增到資料庫內
-      iaNew : false
+      pagination: {},
+      iaNew : false,
+      isLoading: false,
+      status:{
+        fileUploading: false
+      }
     };
   },
   methods: {
-    getProducts() {
-      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products`; // 'http://localhost:3000/api/casper/products';
+    //es6 預設值
+    getProducts(page = 1) {
+      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/products?page=${page}`; // 'http://localhost:3000/api/casper/products';
       const vm = this;
       console.log(process.env.APIPATH, process.env.CUSTOMPATH);
+      vm.isLoading=true;
       this.$http.get(api).then((response) => {
         console.log(response.data);
+        vm.isLoading=false;
         vm.products = response.data.products;
+        vm.pagination=response.data.pagination;
       });
     },
     openModal(isNew, item) {
@@ -174,12 +205,12 @@ export default {
       $('#productModal').modal('show')
     },
     updateProduct(){
-      let api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/products`; // 'http://localhost:3000/api/casper/products';
+      let api =`${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product`;
       //利用true/false 來決定是新增或者編輯，來選擇用post/pull
       let httpMethod = 'post';
       const vm = this;
       if(!vm.isNew){
-        api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/products/${vm.tempProduct.id}`;
+        api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
         httpMethod = 'put';
       }
       console.log(process.env.APIPATH, process.env.CUSTOMPATH);
@@ -195,7 +226,56 @@ export default {
         }
         // vm.products = response.data.products;
       });
-    }
+    },
+    openDelProductModal(item) {
+        const vm = this;
+        $('#delProductModal').modal('show');
+        vm.tempProduct = Object.assign({}, item);
+      },
+      delProduct() {
+        const vm = this;
+        const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
+        this.$http.delete(url).then((response) => {
+          console.log(response, vm.tempProduct);
+          $('#delProductModal').modal('hide');
+          vm.isLoading = false;
+        this.getProducts();
+      });
+    },
+    uploadFile() {
+      console.log(this);
+      /*
+      先取出要上傳的檔案
+      建立formData 物件
+      把要傳的內容加到formData格式內
+      再把它送出
+      */
+      //定義要上傳的檔案
+      const uploadedFile = this.$refs.files.files[0];
+      const vm = this;
+      //web api =>
+      const formData = new FormData();
+      //將欄位新增到formData(欄位,檔案)
+      formData.append('file-to-upload', uploadedFile);
+      //定義路徑
+      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/upload`;
+      //post (路徑,要傳送的內容,物件（改成formdata 格式)）
+      vm.status.fileUploading = true;
+      this.$http.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }).then((response) => {
+        console.log(response.data);
+        if (response.data.success) {
+          // vm.tempProduct.imageUrl = response.data.imageUrl;
+                    // console.log(vm.tempProduct);
+          // 雙向綁定
+          vm.status.fileUploading = false;
+          vm.$set(vm.tempProduct, 'imageUrl', response.data.imageUrl);
+        }
+      });
+    },
   },
   created() {
     this.getProducts();

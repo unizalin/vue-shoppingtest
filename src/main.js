@@ -6,6 +6,7 @@ import VueAxios from 'vue-axios'
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import 'bootstrap'
+import currencyFilter from './filters/currency'
 
 
 import App from './App'
@@ -15,8 +16,11 @@ import './bus'
 Vue.config.productionTip = false
 Vue.use(VueAxios, axios)
 
+
 //vue loading 效果
 Vue.component('Loading', Loading)
+//千分位
+Vue.filter('currency',currencyFilter)
 //前端 axios 請求附帶 Cookies 設定
 //跨域登入驗證
 axios.defaults.withCredentials = true;
