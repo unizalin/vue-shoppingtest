@@ -31,7 +31,10 @@
             <span v-else>未啟用</span>
           </td>
           <td>
-            <button class="btn btn-outline-primary btn-sm" @click="openModal(false, item)">編輯</button>
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button class="btn btn-outline-primary btn-sm" @click="openModal(false, item)">編輯</button>
+              <button class="btn btn-outline-danger btn-sm" @click="openDelProductModal()">刪除</button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -112,7 +115,7 @@
                       placeholder="請輸入單位">
                   </div>
                 </div>
-                 <div class="form-row">
+                <div class="form-row">
                   <div class="form-group col-md-6">
                   <label for="origin_price">原價</label>
                     <input type="number" class="form-control" id="origin_price"
@@ -127,7 +130,7 @@
                   </div>
                 </div>
                 <hr>
-                 <div class="form-group">
+                <div class="form-group">
                   <label for="description">產品描述</label>
                   <textarea type="text" class="form-control" id="description"
                     v-model="tempProduct.description"
@@ -153,7 +156,6 @@
                 </div>
               </div>
             </div>
-
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">取消</button>
@@ -162,20 +164,40 @@
         </div>
       </div>
     </div>
+  <!-- delModal -->
+    <div class="modal" id="delProductModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Modal body text goes here.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
-  import $ from 'jquery';
+import $ from "jquery";
 
 export default {
   data() {
     return {
       products: [],
-      tempProduct: {},//模板的欄位綁定，透過post方式，將模板新增到資料庫內
+      tempProduct: {}, //模板的欄位綁定，透過post方式，將模板新增到資料庫內
       pagination: {},
-      iaNew : false,
+      iaNew: false,
       isLoading: false,
-      status:{
+      status: {
         fileUploading: false
       }
     };
@@ -183,15 +205,17 @@ export default {
   methods: {
     //es6 預設值
     getProducts(page = 1) {
-      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/products?page=${page}`; // 'http://localhost:3000/api/casper/products';
+      const api = `${process.env.APIPATH}/api/${
+        process.env.CUSTOMPATH
+      }/admin/products?page=${page}`; // 'http://localhost:3000/api/casper/products';
       const vm = this;
       console.log(process.env.APIPATH, process.env.CUSTOMPATH);
-      vm.isLoading=true;
-      this.$http.get(api).then((response) => {
+      vm.isLoading = true;
+      this.$http.get(api).then(response => {
         console.log(response.data);
-        vm.isLoading=false;
+        vm.isLoading = false;
         vm.products = response.data.products;
-        vm.pagination=response.data.pagination;
+        vm.pagination = response.data.pagination;
       });
     },
     openModal(isNew, item) {
@@ -202,43 +226,49 @@ export default {
         this.tempProduct = Object.assign({}, item);
         this.isNew = false;
       }
-      $('#productModal').modal('show')
+      $("#productModal").modal("show");
     },
-    updateProduct(){
-      let api =`${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product`;
+    updateProduct() {
+      let api = `${process.env.APIPATH}/api/${
+        process.env.CUSTOMPATH
+      }/admin/product`;
       //利用true/false 來決定是新增或者編輯，來選擇用post/pull
-      let httpMethod = 'post';
+      let httpMethod = "post";
       const vm = this;
-      if(!vm.isNew){
-        api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
-        httpMethod = 'put';
+      if (!vm.isNew) {
+        api = `${process.env.APIPATH}/api/${
+          process.env.CUSTOMPATH
+        }/admin/product/${vm.tempProduct.id}`;
+        httpMethod = "put";
       }
       console.log(process.env.APIPATH, process.env.CUSTOMPATH);
-      this.$http[httpMethod](api, { data: vm.tempProduct }).then((response) => {
+      this.$http[httpMethod](api, { data: vm.tempProduct }).then(response => {
         console.log(response.data);
         if (response.data.success) {
-          $('#productModal').modal('hide');
+          $("#productModal").modal("hide");
           vm.getProducts();
         } else {
-          $('#productModal').modal('hide');
+          $("#productModal").modal("hide");
           vm.getProducts();
-          console.log('新增失敗');
+          console.log("新增失敗");
         }
         // vm.products = response.data.products;
       });
     },
     openDelProductModal(item) {
-        const vm = this;
-        $('#delProductModal').modal('show');
-        vm.tempProduct = Object.assign({}, item);
-      },
-      delProduct() {
-        const vm = this;
-        const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
-        this.$http.delete(url).then((response) => {
-          console.log(response, vm.tempProduct);
-          $('#delProductModal').modal('hide');
-          vm.isLoading = false;
+      const vm = this;
+      $("#delProductModal").modal("show");
+      vm.tempProduct = Object.assign({}, item);
+    },
+    delProduct() {
+      const vm = this;
+      const url = `${process.env.APIPATH}/api/${
+        process.env.CUSTOMPATH
+      }/admin/product/${vm.tempProduct.id}`;
+      this.$http.delete(url).then(response => {
+        console.log(response, vm.tempProduct);
+        $("#delProductModal").modal("hide");
+        vm.isLoading = false;
         this.getProducts();
       });
     },
@@ -256,29 +286,33 @@ export default {
       //web api =>
       const formData = new FormData();
       //將欄位新增到formData(欄位,檔案)
-      formData.append('file-to-upload', uploadedFile);
+      formData.append("file-to-upload", uploadedFile);
       //定義路徑
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/upload`;
+      const url = `${process.env.APIPATH}/api/${
+        process.env.CUSTOMPATH
+      }/admin/upload`;
       //post (路徑,要傳送的內容,物件（改成formdata 格式)）
       vm.status.fileUploading = true;
-      this.$http.post(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }).then((response) => {
-        console.log(response.data);
-        if (response.data.success) {
-          // vm.tempProduct.imageUrl = response.data.imageUrl;
-                    // console.log(vm.tempProduct);
-          // 雙向綁定
-          vm.status.fileUploading = false;
-          vm.$set(vm.tempProduct, 'imageUrl', response.data.imageUrl);
-        }
-      });
-    },
+      this.$http
+        .post(url, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        })
+        .then(response => {
+          console.log(response.data);
+          if (response.data.success) {
+            // vm.tempProduct.imageUrl = response.data.imageUrl;
+            // console.log(vm.tempProduct);
+            // 雙向綁定
+            vm.status.fileUploading = false;
+            vm.$set(vm.tempProduct, "imageUrl", response.data.imageUrl);
+          }
+        });
+    }
   },
   created() {
     this.getProducts();
-  },
+  }
 };
 </script>
