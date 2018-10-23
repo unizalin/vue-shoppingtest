@@ -33,7 +33,7 @@
           <td>
             <div class="btn-group" role="group" aria-label="Basic example">
               <button class="btn btn-outline-primary btn-sm" @click="openModal(false, item)">編輯</button>
-              <button class="btn btn-outline-danger btn-sm" @click="openDelProductModal()">刪除</button>
+              <button class="btn btn-outline-danger btn-sm" @click="openDelProductModal(item)">刪除</button>
             </div>
           </td>
         </tr>
@@ -165,21 +165,24 @@
       </div>
     </div>
   <!-- delModal -->
-    <div class="modal" id="delProductModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="delProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Modal title</h5>
+        <div class="modal-content border-0">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="exampleModalLabel">
+              <span>刪除產品</span>
+            </h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <p>Modal body text goes here.</p>
+            是否刪除 <strong class="text-danger">{{ tempProduct.title }}</strong> 商品(刪除後將無法恢復)。
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary">Save changes</button>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-danger"
+              @click="delProduct">確認刪除</button>
           </div>
         </div>
       </div>
@@ -205,9 +208,7 @@ export default {
   methods: {
     //es6 預設值
     getProducts(page = 1) {
-      const api = `${process.env.APIPATH}/api/${
-        process.env.CUSTOMPATH
-      }/admin/products?page=${page}`; // 'http://localhost:3000/api/casper/products';
+      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/products?page=${page}`; // 'http://localhost:3000/api/casper/products';
       const vm = this;
       console.log(process.env.APIPATH, process.env.CUSTOMPATH);
       vm.isLoading = true;
@@ -229,16 +230,12 @@ export default {
       $("#productModal").modal("show");
     },
     updateProduct() {
-      let api = `${process.env.APIPATH}/api/${
-        process.env.CUSTOMPATH
-      }/admin/product`;
+      let api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product`;
       //利用true/false 來決定是新增或者編輯，來選擇用post/pull
       let httpMethod = "post";
       const vm = this;
       if (!vm.isNew) {
-        api = `${process.env.APIPATH}/api/${
-          process.env.CUSTOMPATH
-        }/admin/product/${vm.tempProduct.id}`;
+        api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
         httpMethod = "put";
       }
       console.log(process.env.APIPATH, process.env.CUSTOMPATH);
@@ -257,17 +254,15 @@ export default {
     },
     openDelProductModal(item) {
       const vm = this;
-      $("#delProductModal").modal("show");
+      $('#delProductModal').modal('show');
       vm.tempProduct = Object.assign({}, item);
     },
     delProduct() {
       const vm = this;
-      const url = `${process.env.APIPATH}/api/${
-        process.env.CUSTOMPATH
-      }/admin/product/${vm.tempProduct.id}`;
-      this.$http.delete(url).then(response => {
+      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
+      this.$http.delete(url).then((response) => {
         console.log(response, vm.tempProduct);
-        $("#delProductModal").modal("hide");
+        $('#delProductModal').modal('hide');
         vm.isLoading = false;
         this.getProducts();
       });
