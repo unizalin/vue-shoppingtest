@@ -2,7 +2,7 @@
   <div>
     <loading :active.sync="isLoading"></loading>
     <div class="text-right mt-4">
-    <button type="button" class="btn btn-primary" @click="openModal(true)">
+      <button type="button" class="btn btn-primary" @click="openModal(true)">
         建立新的產品</button>
     </div>
     <table class="table mt-4">
@@ -31,7 +31,7 @@
             <span v-else>未啟用</span>
           </td>
           <td>
-            <div class="btn-group" role="group" aria-label="Basic example">
+            <div class="btn-group" role="group">
               <button class="btn btn-outline-primary btn-sm" @click="openModal(false, item)">編輯</button>
               <button class="btn btn-outline-danger btn-sm" @click="openDelProductModal(item)">刪除</button>
             </div>
@@ -40,31 +40,9 @@
       </tbody>
     </table>
     <!-- 頁碼換頁 -->
-    <nav aria-label="Page navigation example">
-      <ul class="pagination">
-        <li class="page-item" :class="{'disabled': !pagination.has_pre }">
-          <a class="page-link" href="#" aria-label="Previous"
-            @click.prevent="getProducts(pagination.current_page - 1)">
-            <span aria-hidden="true">&laquo;</span>
-            <span class="sr-only">Previous</span>
-          </a>
-        </li>
-        <li class="page-item" v-for="page in pagination.total_pages" :key="page"
-          :class="{'active': pagination.current_page === page}">
-          <a class="page-link" href="#" @click.prevent="getProducts(page)">{{ page }}</a>
-        </li>
-        <li class="page-item" :class="{'disabled': !pagination.has_next }">
-          <a class="page-link" href="#" aria-label="Next"
-            @click.prevent="getProducts(pagination.current_page + 1)">
-            <span aria-hidden="true">&raquo;</span>
-            <span class="sr-only">Next</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <!-- Modal -->
-    <div class="modal fade" id="productModal" tabindex="-1" role="dialog"
-      aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <Pagination :pages="pagination" @emitPages="getProducts"></Pagination>
+    <!-- productModal -->
+    <div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content border-0">
           <div class="modal-header bg-dark text-white">
@@ -81,74 +59,53 @@
               <div class="col-sm-4">
                 <div class="form-group">
                   <label for="image">輸入圖片網址</label>
-                  <input type="text" class="form-control" id="image"
-                    v-model="tempProduct.imageUrl"
-                    placeholder="請輸入圖片連結">
+                  <input type="text" class="form-control" id="image" v-model="tempProduct.imageUrl" placeholder="請輸入圖片連結">
                 </div>
                 <div class="form-group">
                   <label for="customFile">或 上傳圖片
                     <i class="fas fa-spinner fa-spin" v-if="status.fileUploading"></i>
                   </label>
-                  <input type="file" id="customFile" class="form-control"
-                    ref="files" @change="uploadFile">
+                  <input type="file" id="customFile" class="form-control" ref="files" @change="uploadFile">
                 </div>
                 <img class="img-fluid" :src="tempProduct.imageUrl" alt="">
               </div>
               <div class="col-sm-8">
                 <div class="form-group">
                   <label for="title">標題</label>
-                  <input type="text" class="form-control" id="title"
-                    v-model="tempProduct.title"
-                    placeholder="請輸入標題">
+                  <input type="text" class="form-control" id="title" v-model="tempProduct.title" placeholder="請輸入標題">
                 </div>
                 <div class="form-row">
                   <div class="form-group col-md-6">
                     <label for="category">分類</label>
-                    <input type="text" class="form-control" id="category"
-                      v-model="tempProduct.category"
-                      placeholder="請輸入分類">
+                    <input type="text" class="form-control" id="category" v-model="tempProduct.category" placeholder="請輸入分類">
                   </div>
                   <div class="form-group col-md-6">
                     <label for="price">單位</label>
-                    <input type="unit" class="form-control" id="unit"
-                      v-model="tempProduct.unit"
-                      placeholder="請輸入單位">
+                    <input type="unit" class="form-control" id="unit" v-model="tempProduct.unit" placeholder="請輸入單位">
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-group col-md-6">
-                  <label for="origin_price">原價</label>
-                    <input type="number" class="form-control" id="origin_price"
-                      v-model="tempProduct.origin_price"
-                      placeholder="請輸入原價">
+                    <label for="origin_price">原價</label>
+                    <input type="number" class="form-control" id="origin_price" v-model="tempProduct.origin_price" placeholder="請輸入原價">
                   </div>
                   <div class="form-group col-md-6">
                     <label for="price">售價</label>
-                    <input type="number" class="form-control" id="price"
-                      v-model="tempProduct.price"
-                      placeholder="請輸入售價">
+                    <input type="number" class="form-control" id="price" v-model="tempProduct.price" placeholder="請輸入售價">
                   </div>
                 </div>
                 <hr>
                 <div class="form-group">
                   <label for="description">產品描述</label>
-                  <textarea type="text" class="form-control" id="description"
-                    v-model="tempProduct.description"
-                    placeholder="請輸入產品描述"></textarea>
+                  <textarea type="text" class="form-control" id="description" v-model="tempProduct.description" placeholder="請輸入產品描述"></textarea>
                 </div>
                 <div class="form-group">
                   <label for="content">說明內容</label>
-                  <textarea type="text" class="form-control" id="content"
-                    v-model="tempProduct.content"
-                    placeholder="請輸入產品說明內容"></textarea>
+                  <textarea type="text" class="form-control" id="content" v-model="tempProduct.content" placeholder="請輸入產品說明內容"></textarea>
                 </div>
                 <div class="form-group">
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox"
-                      v-model="tempProduct.is_enabled"
-                      :true-value="1"
-                      :false-value="0"
-                      id="is_enabled">
+                    <input class="form-check-input" type="checkbox" v-model="tempProduct.is_enabled" :true-value="1" :false-value="0" id="is_enabled">
                     <label class="form-check-label" for="is_enabled">
                       是否啟用
                     </label>
@@ -164,7 +121,7 @@
         </div>
       </div>
     </div>
-  <!-- delModal -->
+    <!-- delModal -->
     <div class="modal fade" id="delProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content border-0">
@@ -181,8 +138,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-danger"
-              @click="delProduct">確認刪除</button>
+            <button type="button" class="btn btn-danger" @click="delProduct">確認刪除</button>
           </div>
         </div>
       </div>
@@ -191,7 +147,7 @@
 </template>
 <script>
 import $ from "jquery";
-
+import Pagination from "../Pagination"
 export default {
   data() {
     return {
@@ -204,6 +160,9 @@ export default {
         fileUploading: false
       }
     };
+  },
+  components:{
+    Pagination,
   },
   methods: {
     //es6 預設值
@@ -254,15 +213,15 @@ export default {
     },
     openDelProductModal(item) {
       const vm = this;
-      $('#delProductModal').modal('show');
+      $("#delProductModal").modal("show");
       vm.tempProduct = Object.assign({}, item);
     },
     delProduct() {
       const vm = this;
       const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
-      this.$http.delete(url).then((response) => {
+      this.$http.delete(url).then(response => {
         console.log(response, vm.tempProduct);
-        $('#delProductModal').modal('hide');
+        $("#delProductModal").modal("hide");
         vm.isLoading = false;
         this.getProducts();
       });
@@ -270,11 +229,11 @@ export default {
     uploadFile() {
       console.log(this);
       /*
-      先取出要上傳的檔案
-      建立formData 物件
-      把要傳的內容加到formData格式內
-      再把它送出
-      */
+          先取出要上傳的檔案
+          建立formData 物件
+          把要傳的內容加到formData格式內
+          再把它送出
+          */
       //定義要上傳的檔案
       const uploadedFile = this.$refs.files.files[0];
       const vm = this;
@@ -283,9 +242,7 @@ export default {
       //將欄位新增到formData(欄位,檔案)
       formData.append("file-to-upload", uploadedFile);
       //定義路徑
-      const url = `${process.env.APIPATH}/api/${
-        process.env.CUSTOMPATH
-      }/admin/upload`;
+      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/upload`;
       //post (路徑,要傳送的內容,物件（改成formdata 格式)）
       vm.status.fileUploading = true;
       this.$http

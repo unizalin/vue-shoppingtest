@@ -6,9 +6,12 @@ import Login from '@/components/pages/Login'
 import Products from '@/components/pages/Products'
 import Coupons from '@/components/pages/Coupons'
 import Orders from '@/components/pages/Orders'
+import CustomerOrder from "@/components/pages/CustomerOrders";
+
 Vue.use(Router)
 
 export default new Router({
+  linkActiveClass: 'active',
   routes: [
     {
       //防止用戶在網頁最後面輸入未知數字時，導入回登入頁
@@ -51,7 +54,18 @@ export default new Router({
           meta: { requiresAuth: true }
         }
       ]
-
-    }
+    },
+    {
+      path: '/',
+      name: 'Dashboard',
+      component: Dashboard,
+      children: [
+        {
+          path: 'customer_order',
+          name: 'CustomerOrder',
+          component: CustomerOrder,
+        },
+      ],
+    },
   ]
 })

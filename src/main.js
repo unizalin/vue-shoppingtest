@@ -7,6 +7,7 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import 'bootstrap'
 import currencyFilter from './filters/currency'
+import dateFilter from './filters/date'
 
 
 import App from './App'
@@ -21,6 +22,7 @@ Vue.use(VueAxios, axios)
 Vue.component('Loading', Loading)
 //千分位
 Vue.filter('currency',currencyFilter)
+Vue.filter("date", dateFilter);
 //前端 axios 請求附帶 Cookies 設定
 //跨域登入驗證
 axios.defaults.withCredentials = true;
