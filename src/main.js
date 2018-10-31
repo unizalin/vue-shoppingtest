@@ -1,14 +1,16 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+//npm install axios vue-axios --save
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
-import 'bootstrap'
-import currencyFilter from './filters/currency'
-import dateFilter from './filters/date'
-
+import 'bootstrap';
+import currencyFilter from './filters/currency';
+import dateFilter from './filters/date';
+import VeeValidate from "vee-validate";
+import zhTWValidate from "vee-validate/dist/locale/zh_TW";
 
 import App from './App'
 import router from './router'
@@ -16,11 +18,11 @@ import './bus'
 
 Vue.config.productionTip = false
 Vue.use(VueAxios, axios)
-
-
+VeeValidate.Validator.localize("zh_TW", zhTWValidate);
+Vue.use(VeeValidate);
 //vue loading 效果
 Vue.component('Loading', Loading)
-//千分位
+//filter 帶入 數字轉換成千分位數
 Vue.filter('currency',currencyFilter)
 Vue.filter("date", dateFilter);
 //前端 axios 請求附帶 Cookies 設定
