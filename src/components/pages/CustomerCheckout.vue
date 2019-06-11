@@ -21,7 +21,7 @@
           </tr>
         </tfoot>
       </table>
-       <table class="table">
+      <table class="table">
         <tbody>
           <tr>
             <th width="100">Email</th>

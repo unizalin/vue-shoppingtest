@@ -234,11 +234,16 @@ export default {
     getProducts() {
       const vm = this;
       const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products`;
-      vm.$store.state.isLoading = true;
+      // 直接從 Vuex 抓取判定
+      // vm.$store.state.isLoading = true;
+      // 更改為 vuex 用法
+      // dispatch 連結 vuex 裡面的 actions
+      vm.$store.dispatch('updateLoading',true)
       this.$http.get(url).then((response) => {
         vm.products = response.data.products;
         console.log(response);
-        vm.$store.state.isLoading = false;
+        // vm.$store.state.isLoading = false;
+        vm.$store.dispatch('updateLoading',false)
       });
     },
     getProduct( id ) {
@@ -271,24 +276,28 @@ export default {
     getCart(){
       const vm = this;
       const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
-      vm.$store.state.isLoading = true;
+      // vm.$store.state.isLoading = true;
+      vm.$store.dispatch('updateLoading',true)
       this.$http.get(url).then((response) => {
         // vm.products = response.data.products;
         vm.cart = response.data.data;
         console.log(response);
-        vm.$store.state.isLoading = false;
+        // vm.$store.state.isLoading = false;
+        vm.$store.dispatch('updateLoading',false)
       });
     },
     removeCartItem(id){
       const vm = this;
       const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart/${id}`;
-      vm.$store.state.isLoading = true;
+      // vm.$store.state.isLoading = true;
+      vm.$store.dispatch('updateLoading',true)
       this.$http.delete(url).then((response) => {
         // vm.products = response.data.products;
         // vm.cart = response.data.data;
         vm.getCart();
         console.log(response);
-        vm.$store.state.isLoading = false;
+        // vm.$store.state.isLoading = false;
+        vm.$store.dispatch('updateLoading',false)
       });
     },
     addCouponCode(id){
@@ -297,13 +306,15 @@ export default {
       const coupon ={
         code: vm.coupon_code
       }
-      vm.$store.state.isLoading = true;
+      // vm.$store.state.isLoading = true;
+      vm.$store.dispatch('updateLoading',true)
       this.$http.post(url,{data: coupon}).then((response) => {
         // vm.products = response.data.products;
         // vm.cart = response.data.data;
         vm.getCart();
         console.log(response);
-        vm.$store.state.isLoading = false;
+        // vm.$store.state.isLoading = false;
+        vm.$store.dispatch('updateLoading',false)
       });
     },
     createOrder() {
@@ -311,6 +322,9 @@ export default {
       const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/order`;
       const order = vm.form;
       // vm.isLoading = true;
+      //更改為 actions mutations 
+      // dispatah 為連接 actions 的方法
+      vm.$store.dispatch('updateLoading',true)
       this.$validator.validate().then((result) => {
         if (result) {
           this.$http.post(url, { data: order }).then((response) => {
@@ -318,7 +332,8 @@ export default {
             if (response.data.success) {
               vm.$router.push(`/customer_checkout/${response.data.orderId}`);
             }
-            vm.isLoading = false;
+            // vm.isLoading = false;
+            vm.$store.dispatch('updateLoading',false)
           });
         } else {
           console.log('欄位不完整');
