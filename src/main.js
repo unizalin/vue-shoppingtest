@@ -1,6 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+import Vuex from 'vuex'
 //npm install axios vue-axios --save
 import axios from 'axios'
 import VueAxios from 'vue-axios'
@@ -14,16 +15,18 @@ import zhTWValidate from "vee-validate/dist/locale/zh_TW";
 
 import App from './App'
 import router from './router'
+import store from './store'
 import './bus'
 
 Vue.config.productionTip = false
 Vue.use(VueAxios, axios)
+Vue.use(Vuex)
 VeeValidate.Validator.localize("zh_TW", zhTWValidate);
 Vue.use(VeeValidate);
 //vue loading 效果
 Vue.component('Loading', Loading)
 //filter 帶入 數字轉換成千分位數
-Vue.filter('currency',currencyFilter)
+Vue.filter('currency', currencyFilter)
 Vue.filter("date", dateFilter);
 //前端 axios 請求附帶 Cookies 設定
 //跨域登入驗證
@@ -32,6 +35,7 @@ axios.defaults.withCredentials = true;
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })
