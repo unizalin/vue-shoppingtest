@@ -211,94 +211,25 @@ import $ from "jquery";
 export default {
   data() {
     return {
-      products: [],
-      product:{},
-      carts:[],
-      status:{
-        loadingItem: '', // 判斷哪個元素/產品，讀取中
-      },
-      form:{
-        user:{
-          name: '',
-          email: '',
-          tel: '',
-          address: '',
-        },
-        message: ''
-      },
-      cart:{},
       coupon_code: '',
     };
   },
   methods: {
     getProducts() {
-      const vm = this;
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products`;
-      // 直接從 Vuex 抓取判定
-      // vm.$store.state.isLoading = true;
-      // 更改為 vuex 用法
-      // dispatch 連結 vuex 裡面的 actions
-      vm.$store.dispatch('updateLoading',true)
-      this.$http.get(url).then((response) => {
-        vm.products = response.data.products;
-        console.log(response);
-        // vm.$store.state.isLoading = false;
-        vm.$store.dispatch('updateLoading',false)
-      });
+      this.$store.dispatch('getProducts')
     },
     getProduct( id ) {
-      const vm = this;
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/product/${id}`;
-      vm.status.loadingItem = id; //針對單獨的購物選單做讀取
-      this.$http.get(url).then((response) => {
-        vm.product = response.data.product;
-        $('#productModal').modal('show');
-        console.log(response);
-        vm.status.loadingItem = '';
-      });
+      this.$store.dispatch('getProduct',id)
     },
     //須帶入 商品id 跟 數量
-    addtoCart( id, qty=1){
-      const vm = this;
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
-      vm.status.loadingItem = id;
-      const cart ={
-        product_id : id,
-        qty
-      }
-      this.$http.post(url,{ data : cart }).then((response) => {
-        console.log(response);
-        vm.status.loadingItem = '';
-        vm.getCart();
-        $('#productModal').modal('hide');
-      });
+    addtoCart(id, qty=1){
+      this.$store.dispatch('addtoCart',{id,qty})
     },
     getCart(){
-      const vm = this;
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
-      // vm.$store.state.isLoading = true;
-      vm.$store.dispatch('updateLoading',true)
-      this.$http.get(url).then((response) => {
-        // vm.products = response.data.products;
-        vm.cart = response.data.data;
-        console.log(response);
-        // vm.$store.state.isLoading = false;
-        vm.$store.dispatch('updateLoading',false)
-      });
+      this.$store.dispatch('getCart')
     },
     removeCartItem(id){
-      const vm = this;
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart/${id}`;
-      // vm.$store.state.isLoading = true;
-      vm.$store.dispatch('updateLoading',true)
-      this.$http.delete(url).then((response) => {
-        // vm.products = response.data.products;
-        // vm.cart = response.data.data;
-        vm.getCart();
-        console.log(response);
-        // vm.$store.state.isLoading = false;
-        vm.$store.dispatch('updateLoading',false)
-      });
+      this.$store.dispatch('removeCartItem',id)
     },
     addCouponCode(id){
       const vm = this;
@@ -344,6 +275,21 @@ export default {
   computed: {
     isLoading(){
       return this.$store.state.isLoading
+    },
+    products(){
+      return this.$store.state.products
+    },
+    product(){
+      return this.$store.state.product
+    },
+    cart(){
+      return this.$store.state.cart
+    },
+    status(){
+      return this.$store.state.status
+    },
+    form(){
+      return this.$store.state.form
     }
   },
   created() {
