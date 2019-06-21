@@ -208,6 +208,7 @@
 </template>
 <script>
 import $ from "jquery";
+import {mapGetters,mapActions} from 'vuex'
 export default {
   data() {
     return {
@@ -215,21 +216,9 @@ export default {
     };
   },
   methods: {
-    getProducts() {
-      this.$store.dispatch('getProducts')
-    },
-    getProduct( id ) {
-      this.$store.dispatch('getProduct',id)
-    },
     //須帶入 商品id 跟 數量
     addtoCart(id, qty=1){
       this.$store.dispatch('addtoCart',{id,qty})
-    },
-    getCart(){
-      this.$store.dispatch('getCart')
-    },
-    removeCartItem(id){
-      this.$store.dispatch('removeCartItem',id)
     },
     addCouponCode(id){
       const vm = this;
@@ -271,26 +260,10 @@ export default {
         }
       });
     },
+    ...mapActions(['getProducts','getCart','removeCartItem','getProduct'])
   },
   computed: {
-    isLoading(){
-      return this.$store.state.isLoading
-    },
-    products(){
-      return this.$store.state.products
-    },
-    product(){
-      return this.$store.state.product
-    },
-    cart(){
-      return this.$store.state.cart
-    },
-    status(){
-      return this.$store.state.status
-    },
-    form(){
-      return this.$store.state.form
-    }
+    ...mapGetters(['products','cart','isLoading','product','status','form'])
   },
   created() {
     this.getProducts();

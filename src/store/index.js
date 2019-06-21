@@ -56,7 +56,9 @@ export default new Vuex.Store({
     getProduct(context, id) {
       const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/product/${id}`;
       // vm.status.loadingItem = id; //針對單獨的購物選單做讀取
+      console.log('getProduct', url)
       context.commit('STATUS', id)
+      console.log('status', context.commit('STATUS', id))
       axios.get(url).then((response) => {
         // vm.product = response.data.product;
         context.commit('PRODUCT', response.data.product)
@@ -71,6 +73,7 @@ export default new Vuex.Store({
       // vm.status.loadingItem = id;
       context.commit('LOADING', true)
       context.commit('STATUS', id)
+      console.log('addtoCart', context.commit('STATUS', qty))
       const cart = {
         product_id: id,
         qty
@@ -140,9 +143,31 @@ export default new Vuex.Store({
     },
     STATUS(state, payload) {
       state.status = payload
+      console.log(state.status)
     },
     COUPON_CODE(state, payload) {
       state.coupon_code = payload
     }
+  },
+  getters: {
+    products(state) {
+      return state.products
+    },
+    cart(state) {
+      return state.cart
+    },
+    isLoading(state) {
+      return state.isLoading
+    },
+    product(state) {
+      return state.product
+    },
+    status(state) {
+      return state.status
+    },
+    form(state) {
+      return state.form
+    }
+
   }
 })
